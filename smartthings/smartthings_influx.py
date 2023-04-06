@@ -10,6 +10,10 @@ import time
 SMARTTHINGS_API_KEY = os.environ["SMARTTHINGS_API_KEY"]
 KEY = "Bearer " + SMARTTHINGS_API_KEY
 
+# Limiting the capabilities we care about makes the script go faster
+CAPABILITIES = ["accelerationSensor", "battery", "button", "contactSensor",
+    "powerMeter", "temperatureMeasurement", "threeAxis", "waterSensor"]
+
 # Influx configuration
 INFLUX_NAME = os.environ["INFLUX_NAME"]
 INFLUX_DATABASE = os.environ["INFLUX_DATABASE"]
@@ -172,8 +176,11 @@ def run_script():
     logging.info("Start running script")
     # get a list of all devices
     r = requests.get(
-        "https://api.smartthings.com/v1/devices", headers={"Authorization": KEY}
+        "https://api.smartthings.com/v1/devices",
+        headers={"Authorization": KEY},
+        params={'capabilitiesMode': 'or', 'capability': CAPABILITIES}
     )
+    print(r.url)
 
     devices = r.json()["items"]
     device_list = []
