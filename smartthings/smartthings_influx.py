@@ -32,7 +32,6 @@ class Device(object):
 
 
 class buttonDevice(Device):
-    this_device_type_name = "SmartSense Button"
     status_tags = []
 
     def __init__(self):
@@ -65,7 +64,6 @@ class buttonDevice(Device):
 class waterLeakDevice(Device):
     status_tags = ["temperatureMeasurement", "battery", "waterSensor"]
     commands = ["configuration", "refresh", "healthCheck"]
-    this_device_type_name = "SmartSense Moisture Sensor"
 
     def __init__(self):
         self.water = False
@@ -97,7 +95,6 @@ class waterLeakDevice(Device):
 
 
 class multiDevice(Device):
-    this_device_type_name = "SmartSense Multi Sensor"
     status_tags = [
         "battery",
         "temperature",
@@ -137,7 +134,6 @@ class multiDevice(Device):
 
 
 class powerOutlet(Device):
-    this_device_type_name = "SmartPower Outlet"
     status_tags = []
 
     def __init__(self):
