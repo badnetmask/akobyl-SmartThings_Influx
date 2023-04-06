@@ -24,6 +24,7 @@ class Device(object):
         self.label = ""
         self.id = ""
         self.device_type_name = ""
+        self.categories = []
 
 
 class buttonDevice(Device):
@@ -34,6 +35,12 @@ class buttonDevice(Device):
         self.temperature = 0.0
         self.battery = 0
         super().__init__()
+
+    def hasCategory(categories):
+        for category in categories:
+            if category["name"] == "Button":
+                return True
+        return False
 
     def send_data(self):
         button_data = [
@@ -61,6 +68,12 @@ class waterLeakDevice(Device):
         self.temperature = 0.0
         self.battery = 0
         super().__init__()
+
+    def hasCategory(categories):
+        for category in categories:
+            if category["name"] == "LeakSensor":
+                return True
+        return False
 
     def send_data(self):
         water_leak_data = [
@@ -97,6 +110,12 @@ class multiDevice(Device):
         self.acceleration = False
         super().__init__()
 
+    def hasCategory(categories):
+        for category in categories:
+            if category["name"] == "MultiFunctionalSensor":
+                return True
+        return False
+
     def send_data(self):
         multi_sensor_data = [
             {
@@ -120,6 +139,12 @@ class powerOutlet(Device):
     def __init__(self):
         self.power = 0.0
         super().__init__()
+
+    def hasCategory(categories):
+        for category in categories:
+            if category["name"] == "SmartPlug":
+                return True
+        return False
 
     def send_data(self):
         power_outlet_data = [
@@ -159,6 +184,7 @@ def run_script():
         new_device.name = device["name"]
         new_device.label = device["label"]
         new_device.id = device["deviceId"]
+        new_device.categories = device["components"][0]["categories"]
         # A hub will appear as a device, but it will not have a
         # 'deviceTypeName' field so we can ignore it
         if "deviceTypeName" in device:
@@ -173,7 +199,7 @@ def run_script():
         )
         status_json = status.json()
 
-        if new_device.device_type_name == waterLeakDevice.this_device_type_name:
+        if waterLeakDevice.hasCategory(new_device.categories):
             water_leak_sensor = waterLeakDevice()
             water_leak_sensor.label = new_device.label
             try:
@@ -194,7 +220,7 @@ def run_script():
                 influx_counted += 1
             except:
                 logging.warning("failed water sensor")
-        elif new_device.device_type_name == buttonDevice.this_device_type_name:
+        elif buttonDevice.hasCategory(new_device.categories):
             button_device = buttonDevice()
             button_device.label = new_device.label
             try:
@@ -208,7 +234,7 @@ def run_script():
                 influx_counted += 1
             except:
                 logging.warning("failed button sensor")
-        elif new_device.device_type_name == multiDevice.this_device_type_name:
+        elif multiDevice.hasCategory(new_device.categories):
             multi_device = multiDevice()
             multi_device.label = new_device.label
             try:
@@ -222,7 +248,7 @@ def run_script():
                 influx_counted += 1
             except:
                 logging.warning("failed multi sensor")
-        elif new_device.device_type_name == powerOutlet.this_device_type_name:
+        elif powerOutlet.hasCategory(new_device.categories):
             outlet_device = powerOutlet()
             outlet_device.label = new_device.label
             try:
@@ -241,7 +267,7 @@ def run_script():
     )
 
 
-schedule.every(5).minutes.do(run_script)
+schedule.every(0.5).minutes.do(run_script)
 
 while True:
     schedule.run_pending()
