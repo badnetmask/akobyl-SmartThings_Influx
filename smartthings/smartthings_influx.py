@@ -171,6 +171,13 @@ class temperatureMeasurement(object):
         self.temperature = temperature
         self.unit = unit
 
+def get_status(device_id):
+    # Get device status
+    status = requests.get(
+        f"https://api.smartthings.com/v1/devices/{device_id}/status",
+        headers={"Authorization": KEY},
+    )
+    return status.json()
 
 def run_script():
     logging.info("Start running script")
@@ -199,14 +206,8 @@ def run_script():
         else:
             new_device.device_type_name = ""
 
-        # Get device status
-        status = requests.get(
-            f"https://api.smartthings.com/v1/devices/{new_device.id}/status",
-            headers={"Authorization": KEY},
-        )
-        status_json = status.json()
-
         if waterLeakDevice.hasCategory(new_device.categories):
+            status_json = get_status(new_device.id)
             water_leak_sensor = waterLeakDevice()
             water_leak_sensor.label = new_device.label
             try:
@@ -228,6 +229,7 @@ def run_script():
             except:
                 logging.warning("failed water sensor")
         elif buttonDevice.hasCategory(new_device.categories):
+            status_json = get_status(new_device.id)
             button_device = buttonDevice()
             button_device.label = new_device.label
             try:
@@ -242,6 +244,7 @@ def run_script():
             except:
                 logging.warning("failed button sensor")
         elif multiDevice.hasCategory(new_device.categories):
+            status_json = get_status(new_device.id)
             multi_device = multiDevice()
             multi_device.label = new_device.label
             try:
@@ -256,6 +259,7 @@ def run_script():
             except:
                 logging.warning("failed multi sensor")
         elif powerOutlet.hasCategory(new_device.categories):
+            status_json = get_status(new_device.id)
             outlet_device = powerOutlet()
             outlet_device.label = new_device.label
             try:
@@ -279,4 +283,3 @@ schedule.every(0.5).minutes.do(run_script)
 while True:
     schedule.run_pending()
     time.sleep(1)
-    
